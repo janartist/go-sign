@@ -6,16 +6,26 @@
 
 ### 算法
 
-支持 ```HMAC``` ```RSA``` ```ECDSA``` 签名
+
+
+支持签名：
+- [HMAC](https://github.com/golang/go/blob/master/src/crypto/hmac/hmac.go)
+- [RSA](https://github.com/golang/go/blob/master/src/crypto/rsa/pkcs1v15.go) 
+- [ECDSA](https://github.com/golang/go/blob/master/src/crypto/ecdsa/ecdsa.go)
 
 支持 ```http``` ```grpc``` ```js``` 端调用
 
 
 ### http示例
 
+[http客户端，服务端](https://github.com/janartist/go-sign/blob/main/sign/manager_test.go)
 
 ### JS通过WebAssembly交互示例
-
+[js调用go签名](https://github.com/janartist/go-sign/tree/main/js/example)
+* 关于wasm文件编译(仓库wasm文件已编译好)
+```shell
+GOARCH=wasm GOOS=js go build -o js/example/main.wasm
+```
 
 ### grpc示例
 开发中
