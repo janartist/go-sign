@@ -26,6 +26,28 @@
 ```shell
 GOARCH=wasm GOOS=js go build -o js/example/main.wasm
 ```
+* 签名方法
+```js
+// 示例数据对象，必须为对象，数据随意，支持无限级
+const data = {
+    value: 42,
+    val:"wo de我",
+};
+
+// 固定示例配置对象
+const config = {
+    t: 12345, //时间戳
+    nonce: "wefw23swdwef", //随机数
+    secret: 'mysecret', //密钥，视算法定
+};
+var res = signEncode.call(this, data, config);
+console.log(res)
+{
+    "signature": "MTZlNGJkNmU3NThkM2FlMjRjM2U0ZDVkOTU5MTYxMjVkMWRlZDllZDg1OGNjZDBiNjliMTQwODFkYjhkNmE0NA==",
+    "str": "nonce=wefw23swdwef&t=12345&val=wo+de%E6%88%91&value=42",
+    "err": ""
+}
+```
 
 ### grpc示例
 开发中
