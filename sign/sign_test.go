@@ -10,10 +10,10 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
-	"go_sign/sign"
 	"io/ioutil"
 	"testing"
 
+	"github.com/janartist/go-sign/sign"
 	"github.com/stretchr/testify/assert"
 )
 

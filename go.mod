@@ -1,4 +1,4 @@
-module go_sign
+module github.com/janartist/go-sign
 
 go 1.17
 

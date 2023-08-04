@@ -8,6 +8,8 @@ import (
 	"crypto/rsa"
 	"crypto/sha256"
 	"encoding/asn1"
+	"encoding/hex"
+	"fmt"
 	"hash"
 	"math/big"
 )
@@ -38,11 +40,12 @@ func (h *hMACSigner) Sign(data []byte) ([]byte, error) {
 	hc.Write(data)
 
 	// 计算 HMAC 值
-	signature := hc.Sum(nil)
-	return signature, nil
+	signature := hex.EncodeToString(hc.Sum(nil))
+	return []byte(signature), nil
 }
 
 func (h *hMACSigner) Verify(data, signature []byte) (bool, error) {
+	fmt.Println(string(data), string(signature), 333)
 	sign, err := h.Sign(data)
 	if err != nil {
 		return false, err

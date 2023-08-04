@@ -1,8 +1,10 @@
 package sign
 
 import (
-	"go_sign/coder"
+	"fmt"
 	"strconv"
+
+	"github.com/janartist/go-sign/coder"
 )
 
 const (
@@ -22,22 +24,31 @@ type Manager struct {
 	coder  coder.Coder
 }
 
-func (m *Manager) Sign() ([]byte, error) {
+// Sign  统一签名方法
+// signature为数据 str为签名前有序字符串
+func (m *Manager) Sign() (signature []byte, str string, err error) {
 	values, err := m.coder.ToUrlValues()
 	if err != nil {
-		return nil, err
+		return
 	}
-	values.Set(paramT, strconv.Itoa(int(m.coder.GetT())))
-	values.Set(paramNonce, m.coder.GetNonce())
-	return m.signer.Sign([]byte(values.Encode()))
+	values.Add(paramT, strconv.Itoa(int(m.coder.GetT())))
+	values.Add(paramNonce, m.coder.GetNonce())
+	str = values.Encode()
+	signature, err = m.signer.Sign([]byte(str))
+	return
 }
 
-func (m *Manager) Verify(signature []byte) (bool, error) {
+// Verify  统一签名方法 signature为数据
+// str为签名前有序字符串
+func (m *Manager) Verify(signature []byte) (ok bool, str string, err error) {
 	values, err := m.coder.ToUrlValues()
+	fmt.Println(values, err, 555)
 	if err != nil {
-		return false, err
+		return
 	}
-	values.Set(paramT, strconv.Itoa(int(m.coder.GetT())))
-	values.Set(paramNonce, m.coder.GetNonce())
-	return m.signer.Verify([]byte(values.Encode()), signature)
+	values.Add(paramT, strconv.Itoa(int(m.coder.GetT())))
+	values.Add(paramNonce, m.coder.GetNonce())
+	str = values.Encode()
+	ok, err = m.signer.Verify([]byte(str), signature)
+	return
 }
