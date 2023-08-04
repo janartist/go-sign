@@ -38,7 +38,7 @@ const data = {
 const config = {
     t: 12345, //时间戳
     nonce: "wefw23swdwef", //随机数
-    secret: 'mysecret', //密钥，视算法定
+    secret: 'mysecret', //密钥，视算法定，现为hmac-sha256
 };
 var res = signEncode.call(this, data, config);
 console.log(res)
