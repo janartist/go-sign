@@ -9,7 +9,6 @@ import (
 	"crypto/sha256"
 	"encoding/asn1"
 	"encoding/hex"
-	"fmt"
 	"hash"
 	"math/big"
 )
@@ -38,39 +37,57 @@ func (h *hMACSigner) Sign(data []byte) ([]byte, error) {
 	hc := hmac.New(h.hashFunc, h.secretKey)
 	// 写入消息
 	hc.Write(data)
-
 	// 计算 HMAC 值
 	signature := hex.EncodeToString(hc.Sum(nil))
 	return []byte(signature), nil
 }
 
 func (h *hMACSigner) Verify(data, signature []byte) (bool, error) {
-	fmt.Println(string(data), string(signature), 333)
-	sign, err := h.Sign(data)
-	if err != nil {
-		return false, err
-	}
-	return hmac.Equal(sign, signature), nil
+	// 创建一个 HMAC 对象
+	hc := hmac.New(h.hashFunc, h.secretKey)
+	// 写入消息
+	hc.Write(data)
+	return hmac.Equal([]byte(hex.EncodeToString(hc.Sum(nil))), signature), nil
 }
 
-// rSASigner 支持 RSA 签名
-type rSASigner struct {
+// rSASignerPrivateKey 支持 RSA 签名
+type rSASignerPrivateKey struct {
 	privateKey *rsa.PrivateKey
+	hash       crypto.Hash
 }
 
-func NewRSASigner(privateKey *rsa.PrivateKey) *rSASigner {
-	return &rSASigner{
+type rSASignerPublicKey struct {
+	publicKey *rsa.PublicKey
+	hash      crypto.Hash
+}
+
+func NewRSASignerPrivateKey(privateKey *rsa.PrivateKey, hash crypto.Hash) *rSASignerPrivateKey {
+	return &rSASignerPrivateKey{
 		privateKey: privateKey,
+		hash:       hash,
 	}
 }
 
-func (r *rSASigner) Sign(data []byte) ([]byte, error) {
-	hash := sha256.Sum256(data)
-	return rsa.SignPKCS1v15(rand.Reader, r.privateKey, crypto.SHA256, hash[:])
+func NewRSASignerPublicKey(publicKey *rsa.PublicKey, hash crypto.Hash) *rSASignerPublicKey {
+	return &rSASignerPublicKey{
+		publicKey: publicKey,
+		hash:      hash,
+	}
 }
-func (r *rSASigner) Verify(data, signature []byte) (bool, error) {
+
+func (r *rSASignerPrivateKey) Sign(data []byte) ([]byte, error) {
 	hash := sha256.Sum256(data)
-	err := rsa.VerifyPKCS1v15(&r.privateKey.PublicKey, crypto.SHA256, hash[:], signature)
+	return rsa.SignPKCS1v15(rand.Reader, r.privateKey, r.hash, hash[:])
+}
+func (r *rSASignerPrivateKey) Verify(data, signature []byte) (bool, error) {
+	hash := sha256.Sum256(data)
+	err := rsa.VerifyPKCS1v15(&r.privateKey.PublicKey, r.hash, hash[:], signature)
+	return err == nil, err
+}
+
+func (r *rSASignerPublicKey) Verify(data, signature []byte) (bool, error) {
+	hash := sha256.Sum256(data)
+	err := rsa.VerifyPKCS1v15(r.publicKey, r.hash, hash[:], signature)
 	return err == nil, err
 }
 

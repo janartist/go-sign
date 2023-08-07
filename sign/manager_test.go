@@ -4,15 +4,16 @@ import (
 	"bytes"
 	"crypto/sha256"
 	"fmt"
-	http2 "github.com/janartist/go-sign/http"
-	"github.com/janartist/go-sign/sign"
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"strconv"
 	"testing"
+
+	http2 "github.com/janartist/go-sign/http"
+	"github.com/janartist/go-sign/sign"
+	"github.com/stretchr/testify/assert"
 )
 
-var signature string
+var signatureStr string
 
 func TestManager_SignVerify(t *testing.T) {
 	t.Run("sign", func(t *testing.T) {
@@ -55,7 +56,7 @@ func manager_Sign(t *testing.T) {
 	res, str, err := manager.Sign()
 	fmt.Println(string(res), str)
 	assert.Nil(t, err)
-	signature = string(res)
+	signatureStr = string(res)
 }
 
 func manager_Verify(t *testing.T) {
@@ -85,7 +86,7 @@ func manager_Verify(t *testing.T) {
 			return request.Header.Get("Sign-Nonce")
 		},
 	})
-	ok, _, err := manager.Verify([]byte(signature))
+	ok, _, err := manager.Verify([]byte(signatureStr))
 	assert.Nil(t, err)
 	assert.Equal(t, ok, true)
 }

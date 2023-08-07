@@ -1,8 +1,9 @@
 package main
 
 import (
-	js2 "github.com/janartist/go-sign/js"
 	"syscall/js"
+
+	js2 "github.com/janartist/go-sign/js"
 )
 
 func main() {

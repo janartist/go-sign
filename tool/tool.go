@@ -5,6 +5,7 @@ import (
 	"net/url"
 )
 
+// FlattenData interface to url.Values
 func FlattenData(data interface{}) url.Values {
 	result := make(url.Values)
 	flattenRecursively(result, "", data)

@@ -1,7 +1,6 @@
 package sign
 
 import (
-	"fmt"
 	"strconv"
 
 	"github.com/janartist/go-sign/coder"
@@ -12,7 +11,7 @@ const (
 	paramNonce = "nonce"
 )
 
-func NewManager(signer Signer, coder coder.Coder) *Manager {
+func NewManager(signer Signer, coder coder.Encoder) *Manager {
 	return &Manager{
 		signer: signer,
 		coder:  coder,
@@ -21,7 +20,7 @@ func NewManager(signer Signer, coder coder.Coder) *Manager {
 
 type Manager struct {
 	signer Signer
-	coder  coder.Coder
+	coder  coder.Encoder
 }
 
 // Sign  统一签名方法
@@ -42,7 +41,6 @@ func (m *Manager) Sign() (signature []byte, str string, err error) {
 // str为签名前有序字符串
 func (m *Manager) Verify(signature []byte) (ok bool, str string, err error) {
 	values, err := m.coder.ToUrlValues()
-	fmt.Println(values, err, 555)
 	if err != nil {
 		return
 	}

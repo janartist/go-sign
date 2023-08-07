@@ -1,11 +1,11 @@
 package http
 
 import (
-	"github.com/janartist/go-sign/tool"
-
 	"encoding/json"
 	"net/http"
 	"net/url"
+
+	"github.com/janartist/go-sign/tool"
 )
 
 const (

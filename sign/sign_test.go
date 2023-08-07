@@ -1,16 +1,14 @@
 package sign_test
 
 import (
+	"crypto"
 	"crypto/ecdsa"
 	"crypto/elliptic"
 	"crypto/md5"
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/sha256"
-	"crypto/x509"
-	"encoding/pem"
-	"fmt"
-	"io/ioutil"
+	"math/big"
 	"testing"
 
 	"github.com/janartist/go-sign/sign"
@@ -18,6 +16,18 @@ import (
 )
 
 var data = []byte("我是内容12138")
+
+var rsaPrivateKey = &rsa.PrivateKey{
+	PublicKey: rsa.PublicKey{
+		N: fromBase10("9353930466774385905609975137998169297361893554149986716853295022578535724979677252958524466350471210367835187480748268864277464700638583474144061408845077"),
+		E: 65537,
+	},
+	D: fromBase10("7266398431328116344057699379749222532279343923819063639497049039389899328538543087657733766554155839834519529439851673014800261285757759040931985506583861"),
+	Primes: []*big.Int{
+		fromBase10("98920366548084643601728869055592650835572950932266967461790948584315647051443"),
+		fromBase10("94560208308847015747498523884063394671606671904944666360068158221458669711639"),
+	},
+}
 
 func TestHMACSigner(t *testing.T) {
 	secretKey := []byte("se1")
@@ -48,39 +58,19 @@ func TestHMACSigner(t *testing.T) {
 	})
 }
 
-func aTestRSASigner(t *testing.T) {
-	// 读取 RSA 私钥
-	rsaKeyData, err := ioutil.ReadFile("./private.key")
-	assert.Nil(t, err)
+func TestRSASigner(t *testing.T) {
 
-	block, _ := pem.Decode(rsaKeyData)
-	assert.NotNil(t, block)
-	assert.Equal(t, block.Type, "PRIVATE KEY")
-
-	rsaPrivateKey, err := x509.ParsePKCS1PrivateKey(block.Bytes)
-	assert.NotNil(t, rsaPrivateKey)
-	assert.Nil(t, err)
-	// 读取 RSA 公钥
-	rsaKeyData, err = ioutil.ReadFile("./public.key")
-	assert.Nil(t, err)
-	block, _ = pem.Decode(rsaKeyData)
-	assert.NotNil(t, block)
-	assert.Equal(t, block.Type, "PUBLIC KEY")
-	rsaPublicKey, err := x509.ParsePKIXPublicKey(block.Bytes)
-	assert.Nil(t, err)
-	assert.NotNil(t, rsaPublicKey)
-
-	RSASignerPrivateKey := sign.NewRSASigner(rsaPrivateKey)
-	RSASignerPublicKey := sign.NewRSASigner(&rsa.PrivateKey{PublicKey: *rsaPublicKey.(*rsa.PublicKey)})
+	RSASignerPrivateKey := sign.NewRSASignerPrivateKey(rsaPrivateKey, crypto.SHA256)
 	signature, err := RSASignerPrivateKey.Sign(data)
 	assert.Nil(t, err)
 	ok, err := RSASignerPrivateKey.Verify(data, signature)
 	assert.Nil(t, err)
 	assert.Equal(t, ok, true)
+
+	RSASignerPublicKey := sign.NewRSASignerPublicKey(&rsaPrivateKey.PublicKey, crypto.SHA256)
 	ok, err = RSASignerPublicKey.Verify(data, signature)
 	assert.Nil(t, err)
 	assert.Equal(t, ok, true)
-	fmt.Print(1122)
 }
 
 func TestECDSASigner(t *testing.T) {
@@ -95,4 +85,12 @@ func TestECDSASigner(t *testing.T) {
 	ok, err := ECDSASigner.Verify(data, signature)
 	assert.Nil(t, err)
 	assert.Equal(t, ok, true)
+}
+
+func fromBase10(base10 string) *big.Int {
+	i, ok := new(big.Int).SetString(base10, 10)
+	if !ok {
+		panic("bad number: " + base10)
+	}
+	return i
 }
