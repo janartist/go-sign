@@ -22,9 +22,9 @@
 
 ### JS通过WebAssembly交互示例
 [js调用go签名](https://github.com/janartist/go-sign/tree/main/js/example)
-* 关于wasm文件编译(仓库wasm文件已编译好)
+* 关于使用tinygo的wasm文件编译(仓库wasm文件已编译好)
 ```shell
-GOARCH=wasm GOOS=js go build -o js/example/main.wasm
+ GOARCH=wasm GOOS=js   tinygo build -o js/example/main.wasm  -target wasm    js/example/wasm.go
 ```
 * 签名方法
 ```js

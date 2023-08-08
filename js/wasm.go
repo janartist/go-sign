@@ -2,7 +2,6 @@ package js
 
 import (
 	"crypto/sha256"
-	"encoding/base64"
 	"fmt"
 	"syscall/js"
 
@@ -53,9 +52,7 @@ func (wasm) SignEncode(this js.Value, p []js.Value) interface{} {
 	}
 	manager := sign.NewManager(sign.NewHMACSigner(sha256.New, []byte(p[1].Get("secret").String())), httpJs)
 	res, str, err := manager.Sign()
-	utf8Str := string(res)
-	fmt.Println("signature:", utf8Str)
-	jsObject.Set("signature", base64.StdEncoding.EncodeToString([]byte(utf8Str)))
+	jsObject.Set("signature", string(res))
 	jsObject.Set("str", str)
 	err2 := ""
 	if err != nil {
